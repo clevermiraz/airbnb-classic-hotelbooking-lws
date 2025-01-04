@@ -29,6 +29,9 @@ export default function LoginForm() {
             if (!response?.error) {
                 toast.success("Logged in successfully");
                 router.push("/");
+                router.back();
+            } else {
+                toast.error("Invalid credentials");
             }
         } catch (error) {
             console.error("Failed to sign in with Google", error);

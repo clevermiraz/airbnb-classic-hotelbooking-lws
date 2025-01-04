@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { auth } from "@/auth";
-import Logout from "@/components/Logout";
 import logo from "@/public/assets/logo.svg";
 import ClientToggleNavbar from "./ClientToggleNavbar";
 
@@ -32,54 +31,7 @@ export default async function Navbar() {
                     </button>
                 </div>
 
-                <ClientToggleNavbar>
-                    {session ? (
-                        <>
-                            <span>
-                                <ul>
-                                    <li className="cursor-pointer px-3 py-2 text-sm bg-teal-50 text-zinc-700 transition-all hover:bg-teal-100 hover:text-zinc-800 hover:pl-4">
-                                        {session?.user?.name}
-                                        <br />
-                                        {session.user?.email}
-                                    </li>
-                                </ul>
-                            </span>
-                            <Link href="/create-hotel" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Create Hotel
-                                </li>
-                            </Link>
-
-                            <Link href="/manage-hotels" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Manage Hotels
-                                </li>
-                            </Link>
-
-                            <Link href="/bookings" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Bookings
-                                </li>
-                            </Link>
-
-                            <Logout />
-                        </>
-                    ) : (
-                        <>
-                            <Link href="/login" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Login
-                                </li>
-                            </Link>
-
-                            <Link href="/register" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Signup
-                                </li>
-                            </Link>
-                        </>
-                    )}
-                </ClientToggleNavbar>
+                <ClientToggleNavbar session={session} />
             </nav>
         </>
     );
