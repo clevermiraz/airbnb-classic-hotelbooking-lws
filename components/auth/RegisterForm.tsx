@@ -1,11 +1,20 @@
 "use client";
 
-import axiosInstance from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import Loader from "@/components/Loader";
+import axiosInstance from "@/lib/axiosInstance";
+
 export default function RegisterForm() {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const router = useRouter();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const formData = new FormData(e.currentTarget);
 
         if (formData.get("password") !== formData.get("confirmPassword")) {
@@ -14,6 +23,8 @@ export default function RegisterForm() {
         }
 
         try {
+            setIsLoading(true);
+
             const response = await axiosInstance.post("/api/auth/register", {
                 fullName: formData.get("fullName"),
                 email: formData.get("email"),
@@ -21,6 +32,9 @@ export default function RegisterForm() {
             });
 
             toast.success(response.data.message);
+            if (response.status === 201) {
+                router.push("/login");
+            }
         } catch (error) {
             if (error.response && error.response.data) {
                 const { message, details } = error.response.data;
@@ -40,6 +54,8 @@ export default function RegisterForm() {
             } else {
                 toast.error("An unexpected error occurred. Please try again.");
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -79,7 +95,7 @@ export default function RegisterForm() {
                     type="submit"
                     className="w-full bg-primary text-white rounded-full py-3 hover:bg-primary transition"
                 >
-                    Continue
+                    {!isLoading ? "Continue" : <Loader />}
                 </button>
             </form>
         </>

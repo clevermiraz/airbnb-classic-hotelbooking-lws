@@ -1,9 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { auth } from "@/auth";
+import Logout from "@/components/Logout";
 import logo from "@/public/assets/logo.svg";
+import ClientToggleNavbar from "./ClientToggleNavbar";
 
-export default function Navbar() {
+export default async function Navbar() {
+    const session = await auth();
+
     return (
         <>
             <nav className="grid grid-cols-2 md:flex justify-between items-center py-3 bg-white border-b mb-6 md:gap-8 px-4 md:px-8 lg:px-20">
@@ -27,32 +32,18 @@ export default function Navbar() {
                     </button>
                 </div>
 
-                <div className="flex items-center space-x-4 relative justify-end">
-                    <button>
-                        <i className="fas fa-language text-zinc-700 text-xl"></i>
-                    </button>
-                    <button className="bg-white border border-zinc-300 text-zinc-800 px-4 py-2 rounded-full hover:shadow-md flex gap-3 items-center justify-center">
-                        <i className="fas fa-bars"></i>
-                        <span className="bg-zinc-600 w-6 h-6 rounded-full flex items-center justify-center text-xs text-white">
-                            <i className="fas fa-user text-white"></i>
-                        </span>
-                    </button>
-
-                    {/* <!-- Popup --> */}
-                    <div className="max-w-48 w-48 bg-white shadow-sm border rounded-md absolute right-0 top-full max-h-fit mt-2 z-50 hidden lg:block">
-                        <ul className="">
-                            <Link href="/login" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Login
-                                </li>
-                            </Link>
-
-                            <Link href="/register" className="w-full">
-                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Signup
-                                </li>
-                            </Link>
-
+                <ClientToggleNavbar>
+                    {session ? (
+                        <>
+                            <span>
+                                <ul>
+                                    <li className="cursor-pointer px-3 py-2 text-sm bg-teal-50 text-zinc-700 transition-all hover:bg-teal-100 hover:text-zinc-800 hover:pl-4">
+                                        {session?.user?.name}
+                                        <br />
+                                        {session.user?.email}
+                                    </li>
+                                </ul>
+                            </span>
                             <Link href="/create-hotel" className="w-full">
                                 <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
                                     Create Hotel
@@ -71,14 +62,24 @@ export default function Navbar() {
                                 </li>
                             </Link>
 
-                            <Link href="#" className="w-full">
+                            <Logout />
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/login" className="w-full">
                                 <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
-                                    Logout
+                                    Login
                                 </li>
                             </Link>
-                        </ul>
-                    </div>
-                </div>
+
+                            <Link href="/register" className="w-full">
+                                <li className="px-3 py-2 text-sm text-zinc-700 transition-all hover:bg-zinc-50 hover:text-zinc-800 hover:pl-4">
+                                    Signup
+                                </li>
+                            </Link>
+                        </>
+                    )}
+                </ClientToggleNavbar>
             </nav>
         </>
     );

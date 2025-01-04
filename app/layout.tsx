@@ -1,3 +1,4 @@
+import ClientProvider from "@/components/ClientProvider";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
@@ -29,9 +30,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                {children}
+                <ClientProvider>
+                    {children}
 
-                <Toaster position="top-right" />
+                    <Toaster position="top-right" />
+                </ClientProvider>
             </body>
         </html>
     );

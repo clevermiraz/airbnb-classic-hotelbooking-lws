@@ -28,12 +28,12 @@ export async function POST(request: NextRequest) {
 
         // Create user
         await User.create({
-            fullName,
+            name: fullName,
             email,
             password: hashedPassword,
         });
 
-        return NextResponse.json({ message: `User ${fullName} has been created.` }, { status: 201 });
+        return NextResponse.json({ message: `User ${fullName} has been created. Please Login` }, { status: 201 });
     } catch (error: any) {
         if (error.name === "ZodError") {
             return NextResponse.json({ message: "Validation error.", details: error.errors }, { status: 422 });

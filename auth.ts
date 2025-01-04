@@ -5,26 +5,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { redirect } from "next/navigation";
 
-import { increaseLoginAttemptIfPasswordIsWrong, resetLoginAttempt } from "./app/actions/auth.actions";
-import { AuthTokenModel } from "./app/models/TokenModel";
-import { UserModel } from "./app/models/userModel";
-import connectMongo from "./db/connectMongo";
-import connectMongoDB from "./db/mongodb";
-import { getAuthTokenByEmail } from "./db/queries/token.queries";
-import User from "./models/Users";
-import generateAuthToken from "./utils/generateAuthToken";
-import mongoClientPromise from "./utils/mongoClientPromise";
+import connectMongoDB from "@/db/mongodb";
+import { getAuthTokenByEmail } from "@/db/queries/token.queries";
+import generateAuthToken from "@/lib/generateAuthToken";
+import mongoClientPromise from "@/lib/mongoClientPromise";
+import { AuthTokenModel } from "@/models/TokenModel";
+import User from "@/models/Users";
 
-export const {
-    handlers: { GET, POST },
-    auth,
-    signIn,
-    signOut,
-} = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
     trustHost: true,
     adapter: MongoDBAdapter(mongoClientPromise, {
         databaseName: process.env.ENVIRONMENT,
     }),
+
     session: {
         strategy: "jwt",
     },
@@ -39,28 +32,28 @@ export const {
             async authorize(credentials) {
                 if (credentials === null) return null;
 
-                await connectMongo();
+                await connectMongoDB();
 
                 try {
-                    const user = await UserModel.findOne({ email: credentials.email });
+                    const user = await User.findOne({ email: credentials.email });
+
                     if (user) {
                         const isMatch = await bcrypt.compare(credentials.password as string, user.password);
+
                         if (isMatch) {
                             // create a access token and refresh token with the users email on first log in
                             await generateAuthToken(credentials.email as string, credentials.remember as string);
-                            // reset the login attempt if user successfully logs in
-                            await resetLoginAttempt(credentials.email as string);
+
                             return user;
                         } else {
-                            // implemented a max retry and jail feature
-                            await increaseLoginAttemptIfPasswordIsWrong(credentials.email as string);
-                            throw new Error("Wrong Credentials");
+                            return null;
                         }
                     } else {
-                        throw new Error("No user found");
+                        return null;
                     }
                 } catch (error) {
-                    throw new Error(error as any);
+                    console.log(error);
+                    return null;
                 }
             },
         }),
