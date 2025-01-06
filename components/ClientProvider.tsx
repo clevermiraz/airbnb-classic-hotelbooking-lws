@@ -1,9 +1,7 @@
 "use client";
 
-import { Fragment, useRef } from "react";
+import { Fragment } from "react";
 
 export default function ClientProvider({ children }) {
-    const fragmentRef = useRef();
-
-    return <Fragment ref={fragmentRef}>{children}</Fragment>;
+    return <Fragment>{children}</Fragment>;
 }
