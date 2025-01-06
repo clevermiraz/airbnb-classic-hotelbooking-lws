@@ -1,14 +1,14 @@
 import Footer from "@/components/Footer";
 import HotelList from "@/components/home/HotelList";
-import Pagination from "@/components/home/Pagination";
 import Navbar from "@/components/Navbar";
 
-export default function Home() {
+export default function Home({ searchParams }) {
+    const currentPage = searchParams?.page ? searchParams?.page : 1;
+
     return (
         <main>
             <Navbar />
-            <HotelList />
-            <Pagination />
+            <HotelList currentPage={currentPage} />
             <Footer />
         </main>
     );

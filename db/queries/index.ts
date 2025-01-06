@@ -3,12 +3,21 @@ import { HotelModel } from "@/models/hotel-model";
 import { RatingModel } from "@/models/rating-model";
 import { ReviewModel } from "@/models/review-model";
 
-export async function getAllHotels() {
+export async function getAllHotels(page = 1, limit = 8) {
+    const skip = (page - 1) * limit;
+
     const hotels = await HotelModel.find()
-        .select(["name", "location", "pricePerNight", "totalRoom", "availableRooms", "thumbNailUrl"])
+        .select(["name", "location", "pricePerNight", "totalRooms", "availableRooms", "thumbNailUrl"])
+        .skip(skip)
+        .limit(limit)
         .lean();
 
-    return replaceMongoIdInArray(hotels);
+    const totalHotels = await HotelModel.countDocuments();
+
+    return {
+        hotels: replaceMongoIdInArray(hotels),
+        totalHotels,
+    };
 }
 
 export async function getHotelById(hotelId) {
