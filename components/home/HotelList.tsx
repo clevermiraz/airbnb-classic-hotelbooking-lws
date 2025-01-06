@@ -4,8 +4,6 @@ import HotelCard from "./HotelCard";
 export default async function HotelList() {
     const allHotels = await getAllHotels();
 
-    console.log(allHotels, "all of hotel");
-
     return (
         <>
             <section className="px-6">

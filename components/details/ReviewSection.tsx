@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function ReviewSection() {
     return (
         <>
@@ -14,12 +16,9 @@ export default function ReviewSection() {
                         </div>
                     </div>
 
-                    <a
-                        href="./ReviewModal.html"
-                        className="px-4 py-2 border border-gray-900 rounded-lg hover:bg-gray-100"
-                    >
+                    <button className="px-4 py-2 border border-gray-900 rounded-lg hover:bg-gray-100">
                         Write a Review
-                    </a>
+                    </button>
                 </div>
 
                 {/* <!-- Reviews Grid --> */}
@@ -28,8 +27,10 @@ export default function ReviewSection() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-                                <img
-                                    src="/api/placeholder/48/48"
+                                <Image
+                                    width={48}
+                                    height={48}
+                                    src="https://avatar.iran.liara.run/public/boy?username=Ash"
                                     alt="User avatar"
                                     className="w-full h-full object-cover"
                                 />
@@ -51,37 +52,7 @@ export default function ReviewSection() {
                             highlights of our trip. Sarah was an excellent host, always responsive and helpful.
                         </p>
                     </div>
-
-                    {/* <!-- Review Card 2 --> */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-                                <img
-                                    src="/api/placeholder/48/48"
-                                    alt="User avatar"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div>
-                                <h4 className="font-medium">Emma Wilson</h4>
-                                <p className="text-gray-500 text-sm">November 2024</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center">
-                            <i className="fas fa-star text-yellow-500"></i>
-                            <i className="fas fa-star text-yellow-500"></i>
-                            <i className="fas fa-star text-yellow-500"></i>
-                            <i className="fas fa-star text-yellow-500"></i>
-                            <i className="fas fa-star text-yellow-500"></i>
-                        </div>
-                        <p className="text-gray-600 leading-relaxed">
-                            Perfect location for a family vacation. The villa was spotlessly clean and well-maintained.
-                            The kitchen was fully equipped, and we loved cooking meals while enjoying the ocean view.
-                        </p>
-                    </div>
                 </div>
-
-                {/* <!-- Show More Button --> */}
             </div>
         </>
     );
