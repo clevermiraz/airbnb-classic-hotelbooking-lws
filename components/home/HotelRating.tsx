@@ -1,33 +1,7 @@
-import { getRatingsForAHotel } from "@/db/queries";
+import { getHotelAvgRating } from "@/lib/hotelReviewRating";
 
 export default async function HotelRating({ hotelId }) {
-    const rating = await getRatingsForAHotel(hotelId);
-
-    // const getRatingDescription = (avgRating) => {
-    //     if (avgRating === 0) {
-    //         return "No Ratings Available";
-    //     } else if (avgRating > 0 && avgRating <= 2) {
-    //         return "Poor";
-    //     } else if (avgRating > 2 && avgRating <= 3) {
-    //         return "Average";
-    //     } else if (avgRating > 3 && avgRating <= 4) {
-    //         return "Good";
-    //     } else if (avgRating > 4) {
-    //         return "Very Good";
-    //     }
-    // };
-
-    let avgRating = 0;
-
-    if (rating.length === 1) {
-        avgRating = rating[0].rating;
-    }
-    if (rating.length > 1) {
-        avgRating =
-            rating.reduce((item, currentValue) => {
-                return item.rating + currentValue.rating;
-            }) / rating.length;
-    }
+    const avgRating = await getHotelAvgRating(hotelId);
 
     return (
         <>

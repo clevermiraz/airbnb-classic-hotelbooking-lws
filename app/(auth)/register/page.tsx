@@ -1,7 +1,6 @@
 import RegisterForm from "@/components/auth/RegisterForm";
 import SocialLoginGoogle from "@/components/auth/SocialLoginGoogle";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Register",
@@ -46,9 +45,9 @@ export default function RegisterPage() {
                     <div className="text-center text-sm text-gray-600">
                         <p>
                             Already have an account?
-                            <Link href="/login" className="text-primary hover:underline">
+                            <a href="/login" className="text-primary hover:underline">
                                 Sign In
-                            </Link>
+                            </a>
                         </p>
                     </div>
                 </div>

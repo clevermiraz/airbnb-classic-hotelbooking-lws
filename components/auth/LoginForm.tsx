@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,7 +9,7 @@ import Loader from "@/components/Loader";
 export default function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -28,8 +27,7 @@ export default function LoginForm() {
 
             if (!response?.error) {
                 toast.success("Logged in successfully");
-                router.push("/");
-                router.back();
+                window.location.href = "/";
             } else {
                 toast.error("Invalid credentials");
             }

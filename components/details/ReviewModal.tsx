@@ -1,19 +1,24 @@
-export default function ReviewModal() {
+"use client";
+
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
+import { useRef } from "react";
+
+export default function ReviewModal({ onModalClose }) {
+    const reviewModalRef = useRef<HTMLDivElement>(null);
+
+    useOnClickOutside(reviewModalRef, () => {
+        onModalClose();
+    });
+
     return (
         <>
-            <div
-                className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
-                id="reviewModal"
-            >
-                <div className="bg-white rounded-2xl w-full max-w-xl mx-4 overflow-hidden">
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                <div ref={reviewModalRef} className="bg-white rounded-2xl w-full max-w-xl mx-4 overflow-hidden">
                     {/* <!-- Modal Header --> */}
                     <div className="border-b p-4">
                         <div className="flex justify-between items-center">
                             <h3 className="text-xl font-semibold">Write a review</h3>
-                            <button
-                                className="text-gray-400 hover:text-gray-600"
-                                onClick="document.getElementById('reviewModal').style.display = 'none'"
-                            >
+                            <button className="text-gray-400 hover:text-gray-600" onClick={onModalClose}>
                                 <i className="fas fa-times text-xl"></i>
                             </button>
                         </div>
@@ -76,7 +81,7 @@ export default function ReviewModal() {
                         <div className="flex justify-end gap-4">
                             <button
                                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                                onClick="document.getElementById('reviewModal').style.display = 'none'"
+                                onClick={onModalClose}
                             >
                                 Cancel
                             </button>

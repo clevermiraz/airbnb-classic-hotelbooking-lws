@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,7 +9,7 @@ import axiosInstance from "@/lib/axiosInstance";
 export default function RegisterForm() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,7 +32,7 @@ export default function RegisterForm() {
 
             toast.success(response.data.message);
             if (response.status === 201) {
-                router.push("/login");
+                window.location.href = "/login";
             }
         } catch (error) {
             if (error.response && error.response.data) {

@@ -1,7 +1,6 @@
 import LoginForm from "@/components/auth/LoginForm";
 import SocialLoginGoogle from "@/components/auth/SocialLoginGoogle";
 import { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Login",
@@ -46,9 +45,9 @@ export default function LoginPage() {
                     <div className="text-center text-sm text-gray-600">
                         <p>
                             Don&apos;t have an account?
-                            <Link href="/register" className="text-primary hover:underline">
+                            <a href="/register" className="text-primary hover:underline">
                                 Sign up
-                            </Link>
+                            </a>
                         </p>
                     </div>
                 </div>
