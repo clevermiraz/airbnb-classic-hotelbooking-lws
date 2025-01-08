@@ -33,7 +33,7 @@ export default async function RoomDetailPage({ params }) {
         <main className="bg-gray-50">
             <Navbar />
             <PropertyContainer hotelInfo={hotelInfo} />
-            <ReviewSection />
+            <ReviewSection hotelId={hotelInfo?.id} />
             <Footer />
         </main>
     );

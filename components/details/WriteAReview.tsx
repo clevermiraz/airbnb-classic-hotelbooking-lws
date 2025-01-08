@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ReviewModal from "./ReviewModal";
 
-export default function WriteAReview() {
+export default function WriteAReview({ userId, hotelId }) {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     return (
@@ -15,7 +15,9 @@ export default function WriteAReview() {
                 Write a Review
             </button>
 
-            {isReviewModalOpen && <ReviewModal onModalClose={() => setIsReviewModalOpen(false)} />}
+            {isReviewModalOpen && (
+                <ReviewModal onModalClose={() => setIsReviewModalOpen(false)} userId={userId} hotelId={hotelId} />
+            )}
         </>
     );
 }

@@ -40,11 +40,61 @@ export async function getRatingsForAHotel(hotelId) {
 export async function getReviewsForAHotel(hotelId) {
     await connectMongoDB();
 
-    const reviews = await ReviewModel.find({ hotelId: hotelId }).lean();
-    const totalReviews = await ReviewModel.countDocuments();
+    const reviews = await ReviewModel.find({ hotelId: hotelId }).populate("userId", "name").lean();
+    const totalReviews = await ReviewModel.countDocuments({ hotelId: hotelId });
 
     return {
         reviews: replaceMongoIdInArray(reviews),
         totalReviews,
     };
+}
+
+export async function getUserRatingForHotel(hotelId, userId) {
+    const rating = await RatingModel.findOne({ hotelId, userId }).lean();
+    return rating ? rating.rating : null; // Return the rating or null if not found
+}
+
+interface CreateReviewRatingInput {
+    userId: string;
+    hotelId: string;
+    review: string;
+    rating: number;
+}
+
+export async function createAReviewRating({ userId, hotelId, review, rating }: CreateReviewRatingInput) {
+    try {
+        await connectMongoDB();
+
+        // Validate input
+        if (!userId || !hotelId || typeof review !== "string" || typeof rating !== "number") {
+            throw new Error("Invalid input. Ensure all required fields are provided and valid.");
+        }
+
+        // Check if the user has already submitted a rating/review for this hotel
+        const existingRating = await RatingModel.findOne({ userId, hotelId });
+        const existingReview = await ReviewModel.findOne({ userId, hotelId });
+
+        if (existingRating || existingReview) {
+            throw new Error("You have already submitted a review or rating for this hotel.");
+        }
+
+        // Create the rating document
+        const ratingDoc = await RatingModel.create({
+            userId,
+            hotelId,
+            rating,
+        });
+
+        // Create the review document
+        const reviewDoc = await ReviewModel.create({
+            userId,
+            hotelId,
+            review,
+        });
+
+        return { rating: ratingDoc, review: reviewDoc };
+    } catch (error) {
+        console.error("Error creating review and rating:", error.message);
+        throw new Error(error.message);
+    }
 }
