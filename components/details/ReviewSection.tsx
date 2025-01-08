@@ -10,8 +10,6 @@ export default async function ReviewSection({ hotelId }) {
     const { totalReviews, reviews } = await getReviewsForAHotel(hotelId);
     const session = await auth();
 
-    console.log(totalReviews, reviews);
-
     const reviewsWithRatings = await Promise.all(
         reviews.map(async (review) => {
             const userRating = await getUserRatingForHotel(hotelId, review?.userId?._id); // Get the rating for the specific user
