@@ -98,3 +98,39 @@ export async function createAReviewRating({ userId, hotelId, review, rating }: C
         throw new Error(error.message);
     }
 }
+
+export async function deleteReviewRatingFromDB(reviewId: string, userId: string) {
+    try {
+        await connectMongoDB();
+
+        // Validate input
+        if (!reviewId || !userId) {
+            throw new Error("Invalid input. Both reviewId and userId are required.");
+        }
+
+        // Check if the review exists
+        const existingReview = await ReviewModel.findOne({ _id: reviewId, userId });
+        if (!existingReview) {
+            throw new Error("No review found with the provided reviewId for this user.");
+        }
+
+        // Check if the associated rating exists
+        const existingRating = await RatingModel.findOne({
+            userId,
+            hotelId: existingReview.hotelId, // Use the hotelId from the existing review
+        });
+
+        // Delete the review
+        await ReviewModel.deleteOne({ _id: reviewId, userId });
+
+        // Delete the associated rating if it exists
+        if (existingRating) {
+            await RatingModel.deleteOne({ userId, hotelId: existingReview.hotelId });
+        }
+
+        return { success: true, message: "Review and rating deleted successfully." };
+    } catch (error) {
+        console.error("Error deleting review and rating:", error.message);
+        return { success: false, message: error.message };
+    }
+}

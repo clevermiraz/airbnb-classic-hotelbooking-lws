@@ -1,6 +1,6 @@
 "use server";
 
-import { createAReviewRating } from "@/db/queries";
+import { createAReviewRating, deleteReviewRatingFromDB } from "@/db/queries";
 
 // Define the input types for the function
 interface ReviewRatingInput {
@@ -35,6 +35,36 @@ export async function createReviewRating({
         return {
             success: false,
             error: error.message || "An error occurred during the API request.",
+        };
+    }
+}
+
+export async function deleteReviewRating({
+    reviewId,
+    userId,
+}: {
+    reviewId: string;
+    userId: string;
+}): Promise<{ success: boolean; error?: string; message?: string }> {
+    try {
+        const result = await deleteReviewRatingFromDB(reviewId, userId);
+
+        if (result?.success) {
+            return {
+                success: true,
+                message: result.message || "Review and rating deleted successfully.",
+            };
+        } else {
+            return {
+                success: false,
+                error: result?.message || "Failed to delete the review and rating.",
+            };
+        }
+    } catch (error: any) {
+        // Handle errors
+        return {
+            success: false,
+            error: error.message || "An error occurred during the delete request.",
         };
     }
 }

@@ -3,6 +3,7 @@ import { getReviewsForAHotel, getUserRatingForHotel } from "@/db/queries";
 import { getHotelAvgRating } from "@/lib/hotelReviewRating";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
+import DeleteReviewButton from "./DeleteReviewButton";
 import WriteAReview from "./WriteAReview";
 
 export default async function ReviewSection({ hotelId }) {
@@ -42,7 +43,16 @@ export default async function ReviewSection({ hotelId }) {
                 <div className="grid grid-cols-2 gap-8">
                     {/* <!-- Review Card 1 --> */}
                     {reviewsWithRatings.map((review) => (
-                        <div key={review?.id} className="space-y-4">
+                        <div key={review?.id} className="space-y-4 relative">
+                            {/* Delete Button */}
+                            {String(session?.user?.id || session?.user?._id) ===
+                                String(review?.userId?.id || review?.userId?._id) && (
+                                <DeleteReviewButton
+                                    reviewId={review?.id || review?._id}
+                                    userId={session?.user?.id || session?.user?._id}
+                                />
+                            )}
+
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
                                     <Image
