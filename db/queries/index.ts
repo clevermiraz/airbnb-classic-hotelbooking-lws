@@ -147,3 +147,15 @@ export async function getBookingDetails(bookingId) {
 
     return booking;
 }
+
+export async function getAllBookingsByUser(userId) {
+    await connectMongoDB();
+
+    // Use `find` to fetch all bookings for the specific user
+    const bookings = await BookingModel.find({ userId })
+        .populate("userId", "name email") // Populate user details (name and email)
+        .populate("hotelId", "name description thumbNailUrl") // Populate specific hotel fields
+        .lean(); // Convert MongoDB documents to plain JavaScript objects
+
+    return bookings;
+}
