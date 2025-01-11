@@ -1,4 +1,5 @@
 import { replaceMongoIdInArray, replaceMongoIdInObject } from "@/lib/mongoDataInShape";
+import { BookingModel } from "@/models/booking-model";
 import { HotelModel } from "@/models/hotel-model";
 import { RatingModel } from "@/models/rating-model";
 import { ReviewModel } from "@/models/review-model";
@@ -133,4 +134,16 @@ export async function deleteReviewRatingFromDB(reviewId: string, userId: string)
         console.error("Error deleting review and rating:", error.message);
         return { success: false, message: error.message };
     }
+}
+
+export async function getBookingDetails(bookingId) {
+    await connectMongoDB();
+
+    // Use `findOne` to fetch a single booking and populate specific hotel fields
+    const booking = await BookingModel.findOne({ _id: bookingId })
+        .populate("userId") // Populate userId (all fields or specific fields if needed)
+        .populate("hotelId", "name description thumbNailUrl") // Populate specific fields from the Hotel model
+        .lean();
+
+    return booking;
 }

@@ -1,6 +1,14 @@
+import { getBookingDetails } from "@/db/queries";
+import { formatDateWithMonth } from "@/lib/utils";
 import Image from "next/image";
+import DownloadReceipt from "./DownloadReceipt";
 
-export default function PaymentSuccessPage() {
+export default async function PaymentSuccessPage({ searchParams }) {
+    const bookingId = await searchParams.bookingId;
+    const booking = await getBookingDetails(bookingId);
+
+    console.log(booking);
+
     return (
         <main className="bg-gray-50">
             <div className="max-w-3xl mx-auto p-6">
@@ -20,17 +28,17 @@ export default function PaymentSuccessPage() {
                             quality={100}
                             width={128}
                             height={128}
-                            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Property"
+                            src={booking?.hotelId?.thumbNailUrl}
+                            alt={booking?.hotelId?.name}
                             className="w-32 h-32 rounded-lg object-cover"
                         />
                         <div>
-                            <h2 className="text-2xl font-semibold mb-2">Sea View Room</h2>
+                            <h2 className="text-2xl font-semibold mb-2">{booking?.hotelId?.name}</h2>
                             <div className="flex items-center mb-2">
                                 <i className="fas fa-star text-sm mr-1"></i>
                                 <span className="text-sm">4.6 (500+ reviews)</span>
                             </div>
-                            <p className="text-zinc-600">One room and one living room with a straight sea view....</p>
+                            <p className="text-zinc-600">{booking?.hotelId?.description}</p>
                         </div>
                     </div>
 
@@ -41,15 +49,19 @@ export default function PaymentSuccessPage() {
                             <div className="space-y-3">
                                 <div className="flex justify-between">
                                     <span className="text-zinc-600 text-sm">Check-in</span>
-                                    <span className="text-zinc-500 text-sm">Jan 3, 2025</span>
+                                    <span className="text-zinc-500 text-sm">
+                                        {formatDateWithMonth(booking?.checkIn)}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-zinc-600 text-sm">Check-out</span>
-                                    <span className="text-zinc-500 text-sm">Jan 8, 2025</span>
+                                    <span className="text-zinc-500 text-sm">
+                                        {formatDateWithMonth(booking?.checkOut)}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-zinc-600 text-sm">Guests</span>
-                                    <span className="text-zinc-500 text-sm">1 guest</span>
+                                    <span className="text-zinc-500 text-sm">{booking?.totalGuests} guest</span>
                                 </div>
                             </div>
                         </div>
@@ -59,11 +71,11 @@ export default function PaymentSuccessPage() {
                             <div className="space-y-3">
                                 <div className="flex justify-between">
                                     <span className="text-zinc-600">Total amount paid</span>
-                                    <span className="font-semibold">$364.20</span>
+                                    <span className="font-semibold">${booking?.totalBill}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-zinc-600 text-sm">Booking ID</span>
-                                    <span>BOOK123456</span>
+                                    <span>{booking?._id}</span>
                                 </div>
                             </div>
                         </div>
@@ -111,12 +123,7 @@ export default function PaymentSuccessPage() {
                 </div>
 
                 {/* <!-- Action Buttons --> */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button className="px-6 py-3 bg-primary text-white rounded-lg hover:brightness-90">
-                        <i className="fas fa-download mr-2"></i>
-                        Download Receipt
-                    </button>
-                </div>
+                <DownloadReceipt bookingInfo={booking} />
 
                 {/* <!-- Need Help Section --> */}
                 <div className="mt-12 text-center">
