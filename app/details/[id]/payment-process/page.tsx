@@ -3,7 +3,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import BackButton from "@/components/payment-process/BackButton";
 import PaymentForm from "@/components/payment-process/PaymentForm";
-import PropertyDetail from "@/components/payment-process/PropertyDetail";
+import { getHotelById } from "@/db/queries";
 
 export default async function PaymentProcessPage({
     params,
@@ -19,6 +19,8 @@ export default async function PaymentProcessPage({
 
     const session = await auth();
     const userId = session?.user?.id || session?.user?._id;
+
+    const hotelInfo = await getHotelById(hotelId);
 
     return (
         <main className="bg-gray-50">
@@ -36,10 +38,8 @@ export default async function PaymentProcessPage({
                         checkIn={checkIn}
                         checkOut={checkOut}
                         totalGuests={totalGuests}
+                        hotelInfo={hotelInfo}
                     />
-
-                    {/* <!-- Right Column --> */}
-                    <PropertyDetail />
                 </div>
             </div>
             <Footer />

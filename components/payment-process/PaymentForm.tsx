@@ -2,12 +2,14 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "sonner";
+import Loader from "../Loader";
+import PropertyDetail from "./PropertyDetail";
 
-export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalGuests }) {
+export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalGuests, hotelInfo }) {
     const [cardNumber, setCardNumber] = useState("");
     const [expiration, setExpiration] = useState("");
     const [cvv, setCvv] = useState("");
@@ -22,8 +24,26 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
     const [editableCheckIn, setEditableCheckIn] = useState(new Date(checkIn));
     const [editableCheckOut, setEditableCheckOut] = useState(new Date(checkOut));
     const [editableGuests, setEditableGuests] = useState(totalGuests);
+    const [duration, setDuration] = useState(0); // Duration in days
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
+
+    useEffect(() => {
+        const calculateDuration = () => {
+            const checkInDate = new Date(editableCheckIn);
+            const checkOutDate = new Date(editableCheckOut);
+
+            if (checkInDate && checkOutDate && checkOutDate > checkInDate) {
+                const duration = Math.round((checkOutDate - checkInDate) / (1000 * 3600 * 24)); // Round the result
+                setDuration(duration);
+            } else {
+                setDuration(0); // If invalid, set duration to 0
+            }
+        };
+
+        calculateDuration();
+    }, [editableCheckIn, editableCheckOut]);
 
     const handleSaveDates = () => {
         setIsEditingDates(false);
@@ -117,6 +137,8 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
             return;
         }
 
+        const totalBill = parseInt(hotelInfo?.pricePerNight) * parseInt(duration);
+
         // Prepare the booking data
         const bookingData = {
             hotelId,
@@ -124,7 +146,7 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
             checkIn: checkInDate,
             checkOut: checkOutDate,
             totalGuests: editableGuests,
-            totalBill: 300,
+            totalBill,
             paymentDetails: {
                 cardNumber,
                 expirationDate: expiration,
@@ -140,6 +162,8 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
         };
 
         try {
+            setIsLoading(true);
+
             // Assuming `axiosInstance` is configured with proper base URL
             const response = await axiosInstance.post("/api/booking", bookingData);
 
@@ -151,172 +175,179 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
         } catch (error) {
             toast.error("Booking failed, please try again.");
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div>
-            {/* Trip Section */}
-            <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Your trip</h2>
+        <>
+            <div>
+                {/* Trip Section */}
+                <section className="mb-8">
+                    <h2 className="text-xl font-semibold mb-4">Your trip</h2>
 
-                {/* Dates */}
-                <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h3 className="font-medium">Dates</h3>
-                        {isEditingDates ? (
-                            <div className="space-y-2">
-                                <DatePicker
-                                    selected={editableCheckIn}
-                                    onChange={(date) => setEditableCheckIn(date)}
-                                    className="p-2 border rounded"
-                                    dateFormat="yyyy-MM-dd"
-                                />
-                                <DatePicker
-                                    selected={editableCheckOut}
-                                    onChange={(date) => setEditableCheckOut(date)}
-                                    className="p-2 border rounded"
-                                    dateFormat="yyyy-MM-dd"
-                                />
+                    {/* Dates */}
+                    <div className="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 className="font-medium">Dates</h3>
+                            {isEditingDates ? (
+                                <div className="space-y-2">
+                                    <DatePicker
+                                        selected={editableCheckIn}
+                                        onChange={(date) => setEditableCheckIn(date)}
+                                        className="p-2 border rounded"
+                                        dateFormat="yyyy-MM-dd"
+                                    />
+                                    <DatePicker
+                                        selected={editableCheckOut}
+                                        onChange={(date) => setEditableCheckOut(date)}
+                                        className="p-2 border rounded"
+                                        dateFormat="yyyy-MM-dd"
+                                    />
 
-                                <button
-                                    onClick={handleSaveDates}
-                                    className="ml-2 px-2 py-1 bg-primary text-white rounded-lg hover:brightness-90"
-                                >
-                                    <i className="fas fa-save mr-2"></i>
-                                    Save
-                                </button>
-                            </div>
-                        ) : (
-                            <p className="text-zinc-600 text-sm">
-                                {editableCheckIn.toLocaleDateString()} - {editableCheckOut.toLocaleDateString()}
-                            </p>
-                        )}
+                                    <button
+                                        onClick={handleSaveDates}
+                                        className="ml-2 px-2 py-1 bg-primary text-white rounded-lg hover:brightness-90"
+                                    >
+                                        <i className="fas fa-save mr-2"></i>
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className="text-zinc-600 text-sm">
+                                    {editableCheckIn.toLocaleDateString()} - {editableCheckOut.toLocaleDateString()}
+                                </p>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setIsEditingDates(!isEditingDates)}
+                            className="text-zinc-800 underline text-sm"
+                        >
+                            {isEditingDates ? "Cancel" : "Edit"}
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setIsEditingDates(!isEditingDates)}
-                        className="text-zinc-800 underline text-sm"
-                    >
-                        {isEditingDates ? "Cancel" : "Edit"}
-                    </button>
-                </div>
 
-                {/* Guests */}
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h3 className="font-medium">Guests</h3>
-                        {isEditingGuests ? (
-                            <div>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    value={editableGuests}
-                                    onChange={(e) => setEditableGuests(e.target.value)}
-                                    className="p-2 border rounded w-16"
-                                />
+                    {/* Guests */}
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h3 className="font-medium">Guests</h3>
+                            {isEditingGuests ? (
+                                <div>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={editableGuests}
+                                        onChange={(e) => setEditableGuests(e.target.value)}
+                                        className="p-2 border rounded w-16"
+                                    />
 
-                                <button
-                                    onClick={handleSaveGuests}
-                                    className="ml-2 px-2 py-1 bg-primary text-white rounded-lg hover:brightness-90"
-                                >
-                                    <i className="fas fa-save mr-2"></i>
-                                    Save
-                                </button>
-                            </div>
-                        ) : (
-                            <p className="text-zinc-600 text-sm">{editableGuests} guest(s)</p>
-                        )}
+                                    <button
+                                        onClick={handleSaveGuests}
+                                        className="ml-2 px-2 py-1 bg-primary text-white rounded-lg hover:brightness-90"
+                                    >
+                                        <i className="fas fa-save mr-2"></i>
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className="text-zinc-600 text-sm">{editableGuests} guest(s)</p>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setIsEditingGuests(!isEditingGuests)}
+                            className="text-zinc-800 underline text-sm"
+                        >
+                            {isEditingGuests ? "Cancel" : "Edit"}
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setIsEditingGuests(!isEditingGuests)}
-                        className="text-zinc-800 underline text-sm"
-                    >
-                        {isEditingGuests ? "Cancel" : "Edit"}
-                    </button>
-                </div>
-            </section>
+                </section>
 
-            {/* Payment Section */}
-            <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Pay with American Express</h2>
-                <div className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Card number"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Payment Section */}
+                <section className="mb-8">
+                    <h2 className="text-xl font-semibold mb-4">Pay with American Express</h2>
+                    <div className="space-y-4">
                         <input
                             type="text"
-                            placeholder="Expiration"
-                            value={expiration}
-                            onChange={(e) => setExpiration(e.target.value)}
-                            className="p-3 border rounded-lg"
+                            placeholder="Card number"
+                            value={cardNumber}
+                            onChange={(e) => setCardNumber(e.target.value)}
+                            className="w-full p-3 border rounded-lg"
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                placeholder="Expiration"
+                                value={expiration}
+                                onChange={(e) => setExpiration(e.target.value)}
+                                className="p-3 border rounded-lg"
+                            />
+                            <input
+                                type="text"
+                                placeholder="CVV"
+                                value={cvv}
+                                onChange={(e) => setCvv(e.target.value)}
+                                className="p-3 border rounded-lg"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Billing Address */}
+                <section className="mb-8">
+                    <h2 className="text-xl font-semibold mb-4">Billing address</h2>
+                    <div className="space-y-4">
+                        <input
+                            type="text"
+                            placeholder="Street address"
+                            value={streetAddress}
+                            onChange={(e) => setStreetAddress(e.target.value)}
+                            className="w-full p-3 border rounded-lg"
                         />
                         <input
                             type="text"
-                            placeholder="CVV"
-                            value={cvv}
-                            onChange={(e) => setCvv(e.target.value)}
-                            className="p-3 border rounded-lg"
-                        />
-                    </div>
-                </div>
-            </section>
-
-            {/* Billing Address */}
-            <section className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Billing address</h2>
-                <div className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Street address"
-                        value={streetAddress}
-                        onChange={(e) => setStreetAddress(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Apt or suite number"
-                        value={aptNumber}
-                        onChange={(e) => setAptNumber(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <input
-                        type="text"
-                        placeholder="City"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="w-full p-3 border rounded-lg"
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                        <input
-                            type="text"
-                            placeholder="State"
-                            value={state}
-                            onChange={(e) => setState(e.target.value)}
-                            className="p-3 border rounded-lg"
+                            placeholder="Apt or suite number"
+                            value={aptNumber}
+                            onChange={(e) => setAptNumber(e.target.value)}
+                            className="w-full p-3 border rounded-lg"
                         />
                         <input
                             type="text"
-                            placeholder="ZIP code"
-                            value={zipCode}
-                            onChange={(e) => setZipCode(e.target.value)}
-                            className="p-3 border rounded-lg"
+                            placeholder="City"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            className="w-full p-3 border rounded-lg"
                         />
+                        <div className="grid grid-cols-2 gap-4">
+                            <input
+                                type="text"
+                                placeholder="State"
+                                value={state}
+                                onChange={(e) => setState(e.target.value)}
+                                className="p-3 border rounded-lg"
+                            />
+                            <input
+                                type="text"
+                                placeholder="ZIP code"
+                                value={zipCode}
+                                onChange={(e) => setZipCode(e.target.value)}
+                                className="p-3 border rounded-lg"
+                            />
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Book Button */}
-            <button
-                onClick={handleRequestBook}
-                className="w-full block text-center bg-primary text-white py-3 rounded-lg mt-6 hover:brightness-90"
-            >
-                Request to book
-            </button>
-        </div>
+                {/* Book Button */}
+                <button
+                    onClick={handleRequestBook}
+                    className="w-full block text-center bg-primary text-white py-3 rounded-lg mt-6 hover:brightness-90"
+                >
+                    {!isLoading ? "Request to book" : <Loader />}
+                </button>
+            </div>
+
+            {/* <!-- Right Column --> */}
+            <PropertyDetail hotelInfo={hotelInfo} duration={duration} />
+        </>
     );
 }

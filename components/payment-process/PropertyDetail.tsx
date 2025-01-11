@@ -1,6 +1,14 @@
+"use client";
+
 import Image from "next/image";
 
-export default function PropertyDetail() {
+export default function PropertyDetail({ hotelInfo, duration }) {
+    const pricePerNight = hotelInfo?.pricePerNight;
+    const cleaningFee = "0.00";
+    const serviceFee = "0.00";
+
+    const totalBill = parseInt(pricePerNight) * parseInt(duration);
+
     return (
         <>
             <div>
@@ -10,14 +18,12 @@ export default function PropertyDetail() {
                         <Image
                             width={80}
                             height={80}
-                            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Property"
+                            src={hotelInfo?.thumbNailUrl}
+                            alt={hotelInfo?.name}
                             className="w-20 h-20 rounded-lg object-cover"
                         />
                         <div>
-                            <p className="text-sm">
-                                One room and one living room with a straight sea view, 1.8m queen...
-                            </p>
+                            <p className="text-sm">{hotelInfo?.description}</p>
                             <div className="flex items-center">
                                 <i className="fas fa-star text-sm mr-1"></i>
                                 <span className="text-xs mt-1 text-zinc-500">5.00 (3 Reviews)</span>
@@ -29,20 +35,22 @@ export default function PropertyDetail() {
                         <h3 className="font-semibold mb-4">Price details</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between">
-                                <span>$59.08 x 5 nights</span>
-                                <span>$295.39</span>
+                                <span>
+                                    ${pricePerNight} x {duration} nights
+                                </span>
+                                <span>${totalBill}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Cleaning fee</span>
-                                <span>$17.50</span>
+                                <span>${cleaningFee}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Service fee</span>
-                                <span>$51.31</span>
+                                <span>${serviceFee}</span>
                             </div>
                             <div className="flex justify-between font-semibold pt-3 border-t">
                                 <span>Total (USD)</span>
-                                <span>$364.20</span>
+                                <span>${totalBill}</span>
                             </div>
                         </div>
                     </div>
