@@ -10,6 +10,7 @@ export default async function ReviewSection({ hotelId }) {
     const avgRating = await getHotelAvgRating(hotelId);
     const { totalReviews, reviews } = await getReviewsForAHotel(hotelId);
     const session = await auth();
+    const userId = session?.user?.id || session?.user?._id;
 
     const reviewsWithRatings = await Promise.all(
         reviews.map(async (review) => {
@@ -36,7 +37,7 @@ export default async function ReviewSection({ hotelId }) {
                         </div>
                     </div>
 
-                    <WriteAReview userId={session?.user?._id} hotelId={hotelId} />
+                    <WriteAReview userId={userId} hotelId={hotelId} />
                 </div>
 
                 {/* <!-- Reviews Grid --> */}
@@ -45,12 +46,8 @@ export default async function ReviewSection({ hotelId }) {
                     {reviewsWithRatings.map((review) => (
                         <div key={review?.id} className="space-y-4 relative">
                             {/* Delete Button */}
-                            {String(session?.user?.id || session?.user?._id) ===
-                                String(review?.userId?.id || review?.userId?._id) && (
-                                <DeleteReviewButton
-                                    reviewId={review?.id || review?._id}
-                                    userId={session?.user?.id || session?.user?._id}
-                                />
+                            {String(userId) === String(review?.userId?.id || review?.userId?._id) && (
+                                <DeleteReviewButton reviewId={review?.id || review?._id} userId={userId} />
                             )}
 
                             <div className="flex items-center gap-4">

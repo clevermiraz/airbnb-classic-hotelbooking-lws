@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "sonner";
 
 export default function BookingCard({ hotelInfo, avgRating }) {
     const [startDate, setStartDate] = useState(new Date());
@@ -14,6 +15,37 @@ export default function BookingCard({ hotelInfo, avgRating }) {
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow;
     });
+    const [totalGuest, setTotalGuest] = useState(0);
+
+    const router = useRouter();
+
+    const handleReserve = (e) => {
+        e.preventDefault();
+
+        if (!startDate || !endDate) {
+            toast.error("Please select valid check-in and check-out dates.");
+            return;
+        }
+
+        if (!totalGuest || totalGuest <= 0) {
+            toast.error("Please enter a valid number of guests. Minimum guest count must be 1.");
+            return;
+        }
+
+        if (startDate >= endDate) {
+            toast.error("Check-out date must be after the check-in date.");
+            return;
+        }
+
+        const queryParams = new URLSearchParams({
+            checkIn: startDate.toISOString(),
+            checkOut: endDate.toISOString(),
+            totalGuests: totalGuest,
+        }).toString();
+
+        router.push(`/details/${hotelInfo?.id}/payment-process?${queryParams}`);
+        toast.success("Reservation details confirmed! Redirecting to payment.");
+    };
 
     return (
         <div>
@@ -29,31 +61,40 @@ export default function BookingCard({ hotelInfo, avgRating }) {
                     </div>
                 </div>
 
-                <div className="border rounded-lg mb-4">
-                    <div className="grid grid-cols-2 border-b">
-                        <DatePicker
-                            placeholderText={"Check In"}
-                            selected={startDate}
-                            onChange={(date) => setStartDate(date)}
-                            className="p-3 border-r"
-                        />
+                <form>
+                    <div className="border rounded-lg mb-4">
+                        <div className="grid grid-cols-2 border-b">
+                            <DatePicker
+                                placeholderText={"Check In"}
+                                selected={startDate}
+                                onChange={(date) => setStartDate(date)}
+                                className="p-3 border-r"
+                            />
 
-                        <DatePicker
-                            placeholderText={"Check Out"}
-                            selected={endDate}
-                            onChange={(date) => setEndDate(date)}
-                            className="p-3"
+                            <DatePicker
+                                placeholderText={"Check Out"}
+                                selected={endDate}
+                                onChange={(date) => setEndDate(date)}
+                                className="p-3"
+                            />
+                        </div>
+                        <input
+                            value={totalGuest}
+                            onChange={(e) => setTotalGuest(e.target.value)}
+                            type="number"
+                            placeholder="Guests"
+                            className="w-full p-3"
                         />
                     </div>
-                    <input type="number" placeholder="Guests" className="w-full p-3" />
-                </div>
 
-                <Link
-                    href="/payment-process"
-                    className="w-full block text-center bg-primary text-white py-3 rounded-lg transition-all hover:brightness-90"
-                >
-                    Reserve
-                </Link>
+                    <button
+                        type="submit"
+                        onClick={handleReserve}
+                        className="w-full block text-center bg-primary text-white py-3 rounded-lg transition-all hover:brightness-90"
+                    >
+                        Reserve
+                    </button>
+                </form>
 
                 <div className="text-center mt-4 text-gray-600">
                     <p>You won&apos;t be charged yet</p>
