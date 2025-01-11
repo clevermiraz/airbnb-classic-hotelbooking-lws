@@ -8,6 +8,7 @@ import Search from "./Search";
 
 export default async function Navbar() {
     const session = await auth();
+    const profileImage = session?.user?.image ? session?.user?.image : null;
 
     return (
         <>
@@ -20,7 +21,7 @@ export default async function Navbar() {
 
                 <Search />
 
-                <ClientToggleNavbar session={session} />
+                <ClientToggleNavbar profileImage={profileImage} session={session} />
             </nav>
         </>
     );

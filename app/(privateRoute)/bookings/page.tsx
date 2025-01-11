@@ -11,8 +11,6 @@ export default async function BookingsPage() {
 
     const bookings = await getAllBookingsByUser(userId);
 
-    console.log(bookings);
-
     return (
         <main className="bg-gray-50 text-gray-900 font-sans">
             <Navbar />

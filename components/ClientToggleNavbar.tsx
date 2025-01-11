@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 import Logout from "@/components/Logout";
+import Image from "next/image";
 
-export default function ClientToggleNavbar({ session }) {
+export default function ClientToggleNavbar({ session, profileImage }) {
     const [isNavOpen, setIsNavOpen] = useState(false);
 
     return (
@@ -19,7 +20,11 @@ export default function ClientToggleNavbar({ session }) {
             >
                 <i className="fas fa-bars"></i>
                 <span className="bg-zinc-600 w-6 h-6 rounded-full flex items-center justify-center text-xs text-white">
-                    <i className="fas fa-user text-white"></i>
+                    {profileImage ? (
+                        <Image width={60} height={60} src={profileImage} alt="profileImage" />
+                    ) : (
+                        <i className="fas fa-user text-white"></i>
+                    )}
                 </span>
             </button>
             <div className="max-w-48 w-48 bg-white shadow-sm border rounded-md absolute right-0 top-full max-h-fit mt-2 z-50 lg:block">
