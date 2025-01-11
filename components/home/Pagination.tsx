@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function Pagination({ currentPage = 1, totalItems = 37, itemsPerPage = 8 }) {
+export default function Pagination({ currentPage = 1, totalItems = 37, itemsPerPage = 8, query }) {
     const router = useRouter();
 
     // Ensure currentPage is an integer
@@ -12,7 +12,7 @@ export default function Pagination({ currentPage = 1, totalItems = 37, itemsPerP
 
     const handlePageClick = (page) => {
         if (page > 0 && page <= totalPages) {
-            router.replace(`/?page=${page}`, { scroll: false });
+            router.replace(`/?q=${query}&page=${page}`, { scroll: false });
         }
     };
 

@@ -5,12 +5,20 @@ import { RatingModel } from "@/models/rating-model";
 import { ReviewModel } from "@/models/review-model";
 import connectMongoDB from "../mongodb";
 
-export async function getAllHotels(page = 1, limit = 8) {
+export async function getAllHotels(page = 1, limit = 8, query = "") {
     await connectMongoDB();
 
     const skip = (page - 1) * limit;
+    const searchFilter = query
+        ? {
+              $or: [
+                  { name: { $regex: query, $options: "i" } }, // Case-insensitive search for name
+                  { location: { $regex: query, $options: "i" } }, // Case-insensitive search for location
+              ],
+          }
+        : {}; // If no query, match all documents
 
-    const hotels = await HotelModel.find()
+    const hotels = await HotelModel.find(searchFilter)
         .select(["name", "location", "pricePerNight", "totalRooms", "availableRooms", "thumbNailUrl"])
         .skip(skip)
         .limit(limit)
