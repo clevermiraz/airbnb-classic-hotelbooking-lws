@@ -22,12 +22,13 @@ export const metadata: Metadata = {
     description: "Your next hotel booking destination",
 };
 
-export default function RootLayout({
-    children,
-    authModal,
-}: Readonly<{
+// Define props type for RootLayout
+interface RootLayoutProps {
     children: React.ReactNode;
-}>) {
+    authModal: React.ReactNode; // Optional authModal prop
+}
+
+export default function RootLayout({ children, authModal }: RootLayoutProps) {
     return (
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
