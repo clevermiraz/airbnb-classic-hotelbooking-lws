@@ -7,8 +7,6 @@ export default async function PaymentSuccessPage({ searchParams }) {
     const bookingId = await searchParams.bookingId;
     const booking = await getBookingDetails(bookingId);
 
-    console.log(booking);
-
     return (
         <main className="bg-gray-50">
             <div className="max-w-3xl mx-auto p-6">
