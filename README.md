@@ -2,11 +2,12 @@
 
 -   Dummy User
 
-| Email              | Password   |
-| ------------------ | ---------- |
-| `dummy@email.com`  | `dummy123` |
-| `dummy1@email.com` | `dummy123` |
-| `dummy2@email.com` | `dummy123` |
+| Email              | Password     |
+| ------------------ | ------------ |
+| `mirazhs@pm.me`    | `testing321` |
+| `dummy@email.com`  | `dummy123`   |
+| `dummy1@email.com` | `dummy123`   |
+| `dummy2@email.com` | `dummy123`   |
 
 ---
 
