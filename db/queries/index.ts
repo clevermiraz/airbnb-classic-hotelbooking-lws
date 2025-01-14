@@ -167,3 +167,13 @@ export async function getAllBookingsByUser(userId) {
 
     return bookings;
 }
+
+export async function getCurrentUserHotelBooking(userId, hotelId) {
+    await connectMongoDB();
+
+    // Use `exists` to check if any booking exists for the specific user and hotel
+    const isBookingExists = await BookingModel.exists({ userId, hotelId });
+
+    // Return true if a booking exists, otherwise false
+    return Boolean(isBookingExists);
+}

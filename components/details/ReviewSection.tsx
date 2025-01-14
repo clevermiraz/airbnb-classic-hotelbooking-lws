@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getReviewsForAHotel, getUserRatingForHotel } from "@/db/queries";
+import { getCurrentUserHotelBooking, getReviewsForAHotel, getUserRatingForHotel } from "@/db/queries";
 import { getHotelAvgRating } from "@/lib/hotelReviewRating";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
@@ -11,6 +11,7 @@ export default async function ReviewSection({ hotelId }) {
     const { totalReviews, reviews } = await getReviewsForAHotel(hotelId);
     const session = await auth();
     const userId = session?.user?.id || session?.user?._id;
+    const isCurrentUserHaveBooking = await getCurrentUserHotelBooking(userId, hotelId);
 
     const reviewsWithRatings = await Promise.all(
         reviews.map(async (review) => {
@@ -37,7 +38,10 @@ export default async function ReviewSection({ hotelId }) {
                         </div>
                     </div>
 
-                    <WriteAReview userId={userId} hotelId={hotelId} />
+                    {isCurrentUserHaveBooking &&
+                        !reviewsWithRatings.some(
+                            (review) => String(userId) === String(review?.userId?.id || review?.userId?._id)
+                        ) && <WriteAReview userId={userId} hotelId={hotelId} />}
                 </div>
 
                 {/* <!-- Reviews Grid --> */}
