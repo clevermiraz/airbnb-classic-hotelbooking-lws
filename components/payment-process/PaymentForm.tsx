@@ -9,7 +9,16 @@ import { toast } from "sonner";
 import Loader from "../Loader";
 import PropertyDetail from "./PropertyDetail";
 
-export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalGuests, hotelInfo }) {
+export default function PaymentForm({
+    userId,
+    hotelId,
+    checkIn,
+    checkOut,
+    totalGuests,
+    hotelInfo,
+    userEmail,
+    hotelName,
+}) {
     const [cardNumber, setCardNumber] = useState("");
     const [expiration, setExpiration] = useState("");
     const [cvv, setCvv] = useState("");
@@ -167,8 +176,17 @@ export default function PaymentForm({ userId, hotelId, checkIn, checkOut, totalG
             // Assuming `axiosInstance` is configured with proper base URL
             const response = await axiosInstance.post("/api/booking", bookingData);
 
+            // send email
+            const resendPayload = {
+                ...bookingData,
+                hotelName,
+                userEmail,
+            };
+
+            await axiosInstance.post("/api/resend", resendPayload);
+
             if (response?.status === 201) {
-                toast.success("Booking request successful!");
+                toast.success("Booking request successful! and send mail to your address");
             }
 
             router.push(`/details/${hotelId}/payment-process/success/?bookingId=${response?.data?.booking?._id}`);

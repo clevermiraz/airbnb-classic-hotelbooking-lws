@@ -41,6 +41,7 @@ export default function BookingCard({ hotelInfo, avgRating }) {
             checkIn: startDate.toISOString(),
             checkOut: endDate.toISOString(),
             totalGuests: totalGuest,
+            hotelName: hotelInfo?.name,
         }).toString();
 
         router.push(`/details/${hotelInfo?.id}/payment-process?${queryParams}`);

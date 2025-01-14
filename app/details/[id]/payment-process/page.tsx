@@ -9,16 +9,18 @@ export default async function PaymentProcessPage({
     params,
     searchParams,
 }: {
-    params: { slug: string };
+    params: { id: string };
     searchParams: { [key: string]: string | string[] | undefined };
 }) {
     const hotelId = params?.id;
     const checkIn = searchParams.checkIn as string; // Access query parameters
     const checkOut = searchParams.checkOut as string;
     const totalGuests = searchParams.totalGuests as string;
+    const hotelName = searchParams?.hotelName as string;
 
     const session = await auth();
     const userId = session?.user?.id || session?.user?._id;
+    const userEmail = session?.user?.email;
 
     const hotelInfo = await getHotelById(hotelId);
 
@@ -39,6 +41,8 @@ export default async function PaymentProcessPage({
                         checkOut={checkOut}
                         totalGuests={totalGuests}
                         hotelInfo={hotelInfo}
+                        userEmail={userEmail}
+                        hotelName={hotelName}
                     />
                 </div>
             </div>

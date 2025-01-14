@@ -5,17 +5,24 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
-    const { hotelId, userId, checkIn, checkOut, totalGuests, totalBill, paymentDetails, billingAddress } =
+    const { hotelName, userEmail, checkIn, checkOut, totalGuests, totalBill, paymentDetails, billingAddress } =
         await request.json();
-
-    const emailData = { firstName: "John" };
 
     try {
         const { data, error } = await resend.emails.send({
             from: "Acme <onboarding@resend.dev>",
-            to: ["delivered@resend.dev"],
-            subject: "Hello world",
-            react: EmailTemplate(emailData),
+            to: [userEmail],
+            subject: `Your Booking Details for ${hotelName}`,
+            react: EmailTemplate({
+                userEmail,
+                hotelName,
+                checkIn,
+                checkOut,
+                totalGuests,
+                totalBill,
+                paymentDetails,
+                billingAddress,
+            }),
         });
 
         if (error) {
@@ -24,6 +31,7 @@ export async function POST(request: NextRequest) {
 
         return Response.json(data);
     } catch (error) {
+        console.log(error, "in catch");
         return Response.json({ error }, { status: 500 });
     }
 }
